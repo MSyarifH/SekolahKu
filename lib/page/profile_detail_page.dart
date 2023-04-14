@@ -10,7 +10,6 @@ class DetailSiswaPage extends StatefulWidget {
 enum Gender { male, female }
 
 class _DetailSiswaPageState extends State<DetailSiswaPage> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +23,7 @@ class _DetailSiswaPageState extends State<DetailSiswaPage> {
       body: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
           children: [
-            const CircleAvatar(radius: 70),
+            CircleAvatar(radius: 70, child: Image.asset('assets/images/pria.png')),
             const SizedBox(
               height: 20,
             ),
@@ -40,7 +39,10 @@ class _DetailSiswaPageState extends State<DetailSiswaPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
-                    Text("Jhon wick",style: TextStyle(fontSize: 18),),
+                    Text(
+                      "Jhon wick",
+                      style: TextStyle(fontSize: 18),
+                    ),
                     Text("Nama"),
                   ],
                 )
@@ -61,7 +63,10 @@ class _DetailSiswaPageState extends State<DetailSiswaPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
-                    Text("123123",style: TextStyle(fontSize: 18),),
+                    Text(
+                      "123123",
+                      style: TextStyle(fontSize: 18),
+                    ),
                     Text("No. Hp"),
                   ],
                 )
@@ -82,8 +87,10 @@ class _DetailSiswaPageState extends State<DetailSiswaPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
-                    Text("Pria",style: TextStyle(fontSize: 18),),
-
+                    Text(
+                      "Pria",
+                      style: TextStyle(fontSize: 18),
+                    ),
                     Text("Jenis Kelamin"),
                   ],
                 )
@@ -104,8 +111,10 @@ class _DetailSiswaPageState extends State<DetailSiswaPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
-                    Text("SMA",style: TextStyle(fontSize: 18),),
-
+                    Text(
+                      "SMA",
+                      style: TextStyle(fontSize: 18),
+                    ),
                     Text("Jenjang"),
                   ],
                 )
@@ -126,8 +135,10 @@ class _DetailSiswaPageState extends State<DetailSiswaPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
-                    Text("Jl jalan",style: TextStyle(fontSize: 18),),
-
+                    Text(
+                      "Jl jalan",
+                      style: TextStyle(fontSize: 18),
+                    ),
                     Text("Alamat"),
                   ],
                 )
