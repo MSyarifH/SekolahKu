@@ -1,7 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:sekolahku/hive/student_model.dart';
+import 'package:sekolahku/page/home_page.dart';
 
 class AddSiswaPage extends StatefulWidget {
-  const AddSiswaPage({super.key});
+  final bool isEdit;
+  final int? indexStudent;
+  final StudentModel? student;
+
+  const AddSiswaPage(
+      {super.key,
+      required this.isEdit,
+      required this.student,
+      required this.indexStudent});
 
   @override
   State<AddSiswaPage> createState() => _AddSiswaPageState();
@@ -11,11 +22,94 @@ enum Gender { male, female }
 
 class _AddSiswaPageState extends State<AddSiswaPage> {
   Gender? _selectedGender;
-  String? _selectedItem;
+  String? _jenjang;
+  final TextEditingController _namaDepan = TextEditingController();
+  final TextEditingController _namaBelakang = TextEditingController();
+  final TextEditingController _noHP = TextEditingController();
+  final TextEditingController _alamat = TextEditingController();
 
   bool _checkbox1 = false;
   bool _checkbox2 = false;
   bool _checkbox3 = false;
+
+  String getCheckboxValue() {
+    String value = '';
+    if (_checkbox1) {
+      value += 'membaca,';
+    }
+    if (_checkbox2) {
+      value += 'menulis,';
+    }
+    if (_checkbox3) {
+      value += 'menggambar';
+    }
+
+    value = value.replaceAll(RegExp(r',+$'), '');
+    return value;
+  }
+
+  saveStudent({
+    required String firstName,
+    required String lastName,
+    required String phoneNumber,
+    required String gender,
+    required String school,
+    required String hobby,
+    required String address,
+  }) async {
+    Box box = await Hive.openBox('studentbox');
+    if (!widget.isEdit) {
+      box.add(StudentModel(
+          firstName: firstName,
+          lastName: lastName,
+          phoneNumber: phoneNumber,
+          gender: gender,
+          school: school,
+          hobby: hobby,
+          address: address));
+    } else {
+      box.putAt(
+          widget.indexStudent!,
+          StudentModel(
+              firstName: firstName,
+              lastName: lastName,
+              phoneNumber: phoneNumber,
+              gender: gender,
+              school: school,
+              hobby: hobby,
+              address: address));
+    }
+  }
+
+  fromEdit(bool edit) {
+    if (!edit) {
+      return;
+    } else {
+      setState(() {
+        _namaDepan.text = widget.student!.firstName;
+        _namaBelakang.text = widget.student!.lastName;
+        _noHP.text = widget.student!.phoneNumber;
+        _alamat.text = widget.student!.address;
+        _jenjang = widget.student!.school;
+        Gender f = Gender.values
+            .firstWhere((e) => e.toString() == widget.student!.gender);
+        _selectedGender = f;
+
+        String hobbies = widget.student!.hobby;
+        List<String> hobbyList = hobbies.split(',');
+
+        _checkbox1 = (hobbyList.contains('membaca'));
+        _checkbox2 = (hobbyList.contains('menulis'));
+        _checkbox3 = (hobbyList.contains('menggambar'));
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    fromEdit(widget.isEdit);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +121,10 @@ class _AddSiswaPageState extends State<AddSiswaPage> {
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
           children: [
             Row(
-              children: const [
+              children: [
                 Flexible(
                     child: TextField(
+                  controller: _namaDepan,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Nama Depan',
@@ -40,6 +135,7 @@ class _AddSiswaPageState extends State<AddSiswaPage> {
                 ),
                 Flexible(
                     child: TextField(
+                  controller: _namaBelakang,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Nama Belakang',
@@ -50,11 +146,14 @@ class _AddSiswaPageState extends State<AddSiswaPage> {
             const SizedBox(
               height: 10,
             ),
-            const Flexible(
+
+            // nomor HP + validation
+            Flexible(
                 child: TextField(
+              controller: _noHP,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Nama Depan',
+                labelText: 'Nomor HP',
               ),
             )),
             const SizedBox(
@@ -92,26 +191,36 @@ class _AddSiswaPageState extends State<AddSiswaPage> {
             const SizedBox(
               height: 10,
             ),
+            //pilih jenjang
+            //sdsmpsmasmks1
             DropdownButton<String>(
               hint: Text("Pilih Jenjang"),
-              value: _selectedItem ?? null,
+              value: _jenjang ?? null,
               items: const [
                 DropdownMenuItem<String>(
-                  value: 'Item 1',
-                  child: Text('Item 1'),
+                  value: 'sd',
+                  child: Text('sd'),
                 ),
                 DropdownMenuItem<String>(
-                  value: 'Item 2',
-                  child: Text('Item 2'),
+                  value: 'smp',
+                  child: Text('smp'),
                 ),
                 DropdownMenuItem<String>(
-                  value: 'Item 3',
-                  child: Text('Item 3'),
+                  value: 'sma',
+                  child: Text('sma'),
+                ),
+                DropdownMenuItem<String>(
+                  value: 'smk',
+                  child: Text('smk'),
+                ),
+                DropdownMenuItem<String>(
+                  value: 's1',
+                  child: Text('s1'),
                 ),
               ],
               onChanged: (value) {
                 setState(() {
-                  _selectedItem = value!;
+                  _jenjang = value!;
                 });
               },
             ),
@@ -132,7 +241,7 @@ class _AddSiswaPageState extends State<AddSiswaPage> {
                     });
                   },
                 ),
-                Text('Checkbox 1'),
+                Text('Membaca'),
               ],
             ),
             Row(
@@ -145,7 +254,7 @@ class _AddSiswaPageState extends State<AddSiswaPage> {
                     });
                   },
                 ),
-                Text('Checkbox 2'),
+                Text('Menulis'),
               ],
             ),
             Row(
@@ -158,10 +267,11 @@ class _AddSiswaPageState extends State<AddSiswaPage> {
                     });
                   },
                 ),
-                Text('Checkbox 3'),
+                Text('Menggambar'),
               ],
             ),
             TextField(
+              controller: _alamat,
               maxLines: 5,
               onChanged: (value) {
                 setState(() {
@@ -177,7 +287,21 @@ class _AddSiswaPageState extends State<AddSiswaPage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.orangeAccent,
         onPressed: () {
-          Navigator.pop(context);
+          String checkboxValue = getCheckboxValue();
+          saveStudent(
+            firstName: _namaDepan.text,
+            lastName: _namaBelakang.text,
+            phoneNumber: _noHP.text,
+            address: _alamat.text,
+            gender: _selectedGender.toString(),
+            school: _jenjang.toString(),
+            hobby: checkboxValue,
+          );
+          Navigator.pushReplacement(context, MaterialPageRoute(
+            builder: (context) {
+              return const MyHomePage(title: "SekolahKu");
+            },
+          ));
         },
         tooltip: 'Increment',
         child: const Icon(Icons.save),

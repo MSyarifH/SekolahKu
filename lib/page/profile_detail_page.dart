@@ -1,49 +1,79 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import '../hive/student_model.dart';
+import 'add_page.dart';
 
 class DetailSiswaPage extends StatefulWidget {
-  const DetailSiswaPage({super.key});
+  final StudentModel student;
+  final int studentIndex;
+
+  const DetailSiswaPage(
+      {super.key, required this.student, required this.studentIndex});
 
   @override
   State<DetailSiswaPage> createState() => _DetailSiswaPageState();
 }
 
-enum Gender { male, female }
-
 class _DetailSiswaPageState extends State<DetailSiswaPage> {
+  late Box studentbox;
+
+  @override
+  void initState() {
+    studentbox = Hive.box("studentbox");
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Detail Siswa"),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.delete)),
+          IconButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return  AddSiswaPage(
+                    isEdit: true,
+                    student: widget.student,
+                    indexStudent: widget.studentIndex,
+                  );
+                }));
+              },
+              icon: const Icon(Icons.edit)),
+          IconButton(
+              onPressed: () {
+                studentbox.deleteAt(widget.studentIndex);
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.delete)),
         ],
       ),
       body: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
           children: [
-            CircleAvatar(radius: 70, child: Image.asset('assets/images/pria.png')),
+            CircleAvatar(
+                radius: 70,
+                child: widget.student.gender == "Gender.male"
+                    ? Image.asset('assets/images/pria.png')
+                    : Image.asset('assets/images/wanita.png')),
             const SizedBox(
               height: 20,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Container(
-                  child: const Icon(Icons.account_box),
-                ),
+                const Icon(Icons.account_box),
                 const SizedBox(
                   width: 10,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
-                      "Jhon wick",
-                      style: TextStyle(fontSize: 18),
+                      "${widget.student.firstName} ${widget.student.lastName}",
+                      style: const TextStyle(fontSize: 18),
                     ),
-                    Text("Nama"),
+                    const Text("Nama"),
                   ],
                 )
               ],
@@ -54,20 +84,18 @@ class _DetailSiswaPageState extends State<DetailSiswaPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Container(
-                  child: const Icon(Icons.phone),
-                ),
+                const Icon(Icons.phone),
                 const SizedBox(
                   width: 10,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
-                      "123123",
-                      style: TextStyle(fontSize: 18),
+                      widget.student.phoneNumber,
+                      style: const TextStyle(fontSize: 18),
                     ),
-                    Text("No. Hp"),
+                    const Text("No. Hp"),
                   ],
                 )
               ],
@@ -78,20 +106,20 @@ class _DetailSiswaPageState extends State<DetailSiswaPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Container(
-                  child: const Icon(Icons.label),
-                ),
+                const Icon(Icons.label),
                 const SizedBox(
                   width: 10,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
-                      "Pria",
-                      style: TextStyle(fontSize: 18),
+                      widget.student.gender == "Gender.male"
+                          ? "Pria"
+                          : "Wanita",
+                      style: const TextStyle(fontSize: 18),
                     ),
-                    Text("Jenis Kelamin"),
+                    const Text("Jenis Kelamin"),
                   ],
                 )
               ],
@@ -102,20 +130,18 @@ class _DetailSiswaPageState extends State<DetailSiswaPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Container(
-                  child: const Icon(Icons.school),
-                ),
+                const Icon(Icons.school),
                 const SizedBox(
                   width: 10,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
-                      "SMA",
-                      style: TextStyle(fontSize: 18),
+                      widget.student.school,
+                      style: const TextStyle(fontSize: 18),
                     ),
-                    Text("Jenjang"),
+                    const Text("Jenjang"),
                   ],
                 )
               ],
@@ -126,20 +152,18 @@ class _DetailSiswaPageState extends State<DetailSiswaPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Container(
-                  child: const Icon(Icons.location_on),
-                ),
+                const Icon(Icons.location_on),
                 const SizedBox(
                   width: 10,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
-                      "Jl jalan",
-                      style: TextStyle(fontSize: 18),
+                      widget.student.address,
+                      style: const TextStyle(fontSize: 18),
                     ),
-                    Text("Alamat"),
+                    const Text("Alamat"),
                   ],
                 )
               ],
